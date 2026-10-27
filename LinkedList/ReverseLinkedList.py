@@ -39,12 +39,14 @@ def reverse_list(head: Optional[ListNode]) -> Optional[ListNode]:
     """
     prev = None
     curr = head
-    while curr:
-        nxt = curr.next
-        curr.next = prev
-        prev = curr
-        curr = nxt
-    return prev
+
+    while curr is not None:
+        next_node = curr.next  # 1. Save the lifeline
+        curr.next = prev       # 2. Flip the arrow backward
+        prev = curr            # 3. Advance prev to curr
+        curr = next_node       # 4. Advance curr to the lifeline
+
+    return prev                # prev is now standing on the new head
 
 
 def reverse_between(head: Optional[ListNode], left: int, right: int) -> Optional[ListNode]:
@@ -55,22 +57,28 @@ def reverse_between(head: Optional[ListNode], left: int, right: int) -> Optional
     if not head or left == right:
         return head
 
+    # Phase 1: Setup dummy and walk to the cut point
     dummy = ListNode(0, head)
-    pre = dummy
+    before_left = dummy
 
-    # 1. Walk pre to the node right before 'left'
     for _ in range(left - 1):
-        pre = pre.next
+        before_left = before_left.next
 
-    start = pre.next  # First node of reversed subsegment
-    then = start.next # Node being pulled to front of subsegment
+    # Plant bookmarks and initialize the 3-pointer crew
+    curr = before_left.next
+    sublist_tail = curr
+    prev = None
 
-    # 2. In-place head-insertion
-    for _ in range(right - left):
-        start.next = then.next
-        then.next = pre.next
-        pre.next = then
-        then = start.next
+    # Phase 2: Standard 3-pointer reversal for (right - left + 1) nodes
+    for _ in range(right - left + 1):
+        next_node = curr.next  # 1. Save the lifeline
+        curr.next = prev       # 2. Flip the arrow backward
+        prev = curr            # 3. Advance prev to curr
+        curr = next_node       # 4. Advance curr to the lifeline
+
+    # Phase 3: The Two-Wire Weld
+    before_left.next = prev    # Connect Node 1 -> Node 4
+    sublist_tail.next = curr   # Connect Node 2 -> Node 5
 
     return dummy.next
 

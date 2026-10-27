@@ -57,17 +57,17 @@ Before writing a single line of code in any FAANG interview, apply these 4 rules
 > **Prompt:** Given the `head` of a singly linked list, reverse the list in-place and return the reversed list.
 
 #### 🧠 Intuition & Pointer Dance:
-To reverse a list in $\mathcal{O}(1)$ auxiliary space, maintain 3 pointers: `prev`, `curr`, and `nxt`.  
-At every step, point `curr.next` backwards to `prev`, then shift both pointers forward.
+To reverse a list in $\mathcal{O}(1)$ auxiliary space, maintain 3 pointers: `prev`, `curr`, and `next_node`.  
+At every step, point `curr.next` backwards to `prev`, then advance both pointers forward using the lifeline.
 
 ```
 Initial State:
 prev(None)     curr(1) ──► (2) ──► (3) ──► None
 
-Step 1: Save nxt = curr.next (2)
-Step 2: Point curr.next = prev (None)
-Step 3: prev = curr (1)
-Step 4: curr = nxt (2)
+Step 1: Save next_node = curr.next (2)  [Save the lifeline]
+Step 2: Point curr.next = prev (None)   [Flip arrow backward]
+Step 3: prev = curr (1)                 [Advance prev to curr]
+Step 4: curr = next_node (2)            [Advance curr to lifeline]
 
 Result after 1 step:
 None ◄── (1)      curr(2) ──► (3) ──► None
@@ -86,13 +86,13 @@ def reverseList(head: ListNode) -> ListNode:
     prev = None
     curr = head
     
-    while curr:
-        nxt = curr.next      # 1. Save forward address
-        curr.next = prev     # 2. Reverse pointer
-        prev = curr          # 3. Advance prev
-        curr = nxt           # 4. Advance curr
+    while curr is not None:
+        next_node = curr.next  # 1. Save the lifeline
+        curr.next = prev       # 2. Flip the arrow backward
+        prev = curr            # 3. Advance prev to curr
+        curr = next_node       # 4. Advance curr to the lifeline
         
-    return prev              # prev is the new head!
+    return prev                # prev is now standing on the new head!
 ```
 
 #### ☕ Java Implementation:
@@ -103,67 +103,81 @@ public class Solution {
         ListNode curr = head;
         
         while (curr != null) {
-            ListNode nxt = curr.next;
-            curr.next = prev;
-            prev = curr;
-            curr = nxt;
+            ListNode nextNode = curr.next; // 1. Save the lifeline
+            curr.next = prev;              // 2. Flip arrow backward
+            prev = curr;                   // 3. Advance prev to curr
+            curr = nextNode;               // 4. Advance curr to lifeline
         }
-        return prev;
+        return prev;                       // prev is the new head!
     }
 }
 ```
 
 * **Time Complexity:** $\mathcal{O}(N)$ — Single pass through all $N$ nodes.
-* **Space Complexity:** $\mathcal{O}(1)$ — Only three pointer references.
+* **Space Complexity:** $\mathcal{O}(1)$ — Only three pointer references in CPU registers.
 
 ---
 
 ### Problem 2: Reverse Linked List II (LeetCode 92)
 > **Prompt:** Reverse nodes from position `left` to `right` in a single pass. ($1 \le \text{left} \le \text{right} \le N$).
 
-#### 🧠 The "Head Insertion" Pointer Technique:
-Instead of severing and reconnecting separate lists, use the **Head-Insertion Trick**:
-1. Walk a `pre` pointer to node `left - 1`.
-2. Keep a `start` pointer at node `left`.
-3. In each iteration, pluck the node `then = start.next` and move it directly after `pre`.
+#### 🧠 The 3-Phase "Two-Wire Weld" Mental Model:
+Instead of complex head-insertions, think of this problem in 3 clean phases:
+1. **Phase 1: Walk to the Cut Point:** Walk `before_left` to node `left - 1`. Bookmark `sublist_tail = before_left.next`.
+2. **Phase 2: Standard 3-Pointer Reversal:** Reverse the isolated subsegment of $(right - left + 1)$ nodes using our trusted 3-pointer dance (`next_node = curr.next`, `curr.next = prev`, etc.).
+3. **Phase 3: The Two-Wire Weld:** Reconnect the reversed sublist back into the main pipeline:
+   * **Wire 1 (Front):** `before_left.next = prev` (connects Node 1 to Node 4)
+   * **Wire 2 (Back):** `sublist_tail.next = curr` (connects Node 2 to Node 5)
 
 ```
-Example: 1 -> 2 -> 3 -> 4 -> 5, left = 2, right = 4
-pre = 1, start = 2, then = 3
+Before Reversal:
+1 -> [2 -> 3 -> 4] -> 5 -> None
+▲     ▲          ▲     ▲
+|     |          |     |
+before_left      |     curr (after phase 2)
+      sublist_tail
+                 prev (after phase 2, new sublist head)
 
-Iteration 1 (move 3 after 1):
-1 -> 3 -> 2 -> 4 -> 5
-pre = 1, start = 2, then = 4
-
-Iteration 2 (move 4 after 1):
-1 -> 4 -> 3 -> 2 -> 5 (DONE!)
+After Reversal & The Two-Wire Weld:
+before_left.next = prev     ==> 1 connects to 4
+sublist_tail.next = curr    ==> 2 connects to 5
+Result: 1 -> 4 -> 3 -> 2 -> 5 -> None
 ```
 
 #### 💻 Python Implementation:
 ```python
 def reverseBetween(head: ListNode, left: int, right: int) -> ListNode:
+    if not head or left == right:
+        return head
+
+    # Phase 1: Setup dummy and walk to the cut point
     dummy = ListNode(0, head)
-    pre = dummy
-    
-    # 1. Reach the node just before 'left'
+    before_left = dummy
+
     for _ in range(left - 1):
-        pre = pre.next
-        
-    start = pre.next   # The first node of the sublist to reverse
-    then = start.next  # The node to be moved to the front
-    
-    # 2. Perform (right - left) insertions
-    for _ in range(right - left):
-        start.next = then.next
-        then.next = pre.next
-        pre.next = then
-        then = start.next
-        
+        before_left = before_left.next
+
+    # Plant bookmarks and initialize the 3-pointer crew
+    curr = before_left.next
+    sublist_tail = curr
+    prev = None
+
+    # Phase 2: Standard 3-pointer reversal for (right - left + 1) nodes
+    for _ in range(right - left + 1):
+        next_node = curr.next  # 1. Save the lifeline
+        curr.next = prev       # 2. Flip the arrow backward
+        prev = curr            # 3. Advance prev to curr
+        curr = next_node       # 4. Advance curr to the lifeline
+
+    # Phase 3: The Two-Wire Weld
+    before_left.next = prev    # Connect Node 1 -> Node 4
+    sublist_tail.next = curr   # Connect Node 2 -> Node 5
+
     return dummy.next
 ```
 
-* **Time Complexity:** $\mathcal{O}(N)$ — At most $N$ operations.
-* **Space Complexity:** $\mathcal{O}(1)$ — In-place pointer swapping.
+* **Time Complexity:** $\mathcal{O}(N)$ — Exactly one pass through the list.
+* **Space Complexity:** $\mathcal{O}(1)$ — Constant memory pointer rewiring.
 
 ---
 
