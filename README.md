@@ -29,9 +29,13 @@ FAANG DSA/
 │   ├── LinkedList_Interview_Problems.md # FAANG Interview Guide: 10 Core LeetCode Problems & Pointer Surgery
 │   ├── ReverseLinkedList.py        # LC 206 & LC 92 (Full & subsegment in-place reversals)
 │   ├── LinkedListCycle.py          # LC 141 & LC 142 (Cycle detection & entry point with math proof)
+│   ├── MiddleOfLinkedList.py       # LC 876 (Fast & slow pointer middle finding)
 │   ├── RemoveNthFromEnd.py         # LC 19 (Sentinel node + fixed-distance window in 1 pass)
 │   ├── MergeKSortedLists.py        # LC 21 & LC 23 (Divide & Conquer pairwise merge vs Min-Heap)
 │   ├── ReorderList.py              # LC 143 (3-phase surgery: Midpoint -> Reverse -> Zipper merge)
+│   ├── PalindromeLinkedList.py     # LC 234 (Midpoint -> Reverse second half -> O(1) space compare)
+│   ├── FindDuplicateNumber.py      # LC 287 (Array as virtual linked list + Floyd's Cycle II)
+│   ├── HappyNumber.py              # LC 202 (Fast & slow cycle detection on numbers in O(1) space)
 │   └── LRUCache.py                 # LC 146 (O(1) Hash Map + Doubly Linked List with Sentinel bounds)
 │
 ├── Trees/
@@ -61,10 +65,14 @@ FAANG DSA/
 | 9 | **First Unique Character** | Hashing | Python | Two-pass Frequency Map | $\mathcal{O}(n)$ | $\mathcal{O}(1)$ |
 | 10 | **Reverse Linked List** (LC 206 & 92) | Linked List | Python | 3-Pointer Reversal & Head-Insertion | $\mathcal{O}(n)$ | $\mathcal{O}(1)$ |
 | 11 | **Linked List Cycle II** (LC 141 & 142) | Linked List | Python | Floyd's Fast & Slow + Entry Collision | $\mathcal{O}(n)$ | $\mathcal{O}(1)$ |
-| 12 | **Remove Nth Node From End** (LC 19) | Linked List | Python | Sentinel Dummy + Fixed Window ($N+1$) | $\mathcal{O}(n)$ | $\mathcal{O}(1)$ |
-| 13 | **Merge Two & K Sorted Lists** (LC 21 & 23) | Linked List | Python | Bottom-Up Divide & Conquer vs Min-Heap | $\mathcal{O}(n \log k)$ | $\mathcal{O}(1)$ |
-| 14 | **Reorder List** (LC 143) | Linked List | Python | Midpoint $\to$ Reverse $\to$ Zipper Merge | $\mathcal{O}(n)$ | $\mathcal{O}(1)$ |
-| 15 | **LRU Cache** (LC 146) | Linked List / Design | Python | Hash Map + Doubly Linked List | $\mathcal{O}(1)$ | $\mathcal{O}(\text{capacity})$ |
+| 12 | **Middle of the Linked List** (LC 876) | Linked List | Python | Fast & Slow Pointers (1x vs 2x) | $\mathcal{O}(n)$ | $\mathcal{O}(1)$ |
+| 13 | **Remove Nth Node From End** (LC 19) | Linked List | Python | Sentinel Dummy + Fixed Window ($N+1$) | $\mathcal{O}(n)$ | $\mathcal{O}(1)$ |
+| 14 | **Merge Two & K Sorted Lists** (LC 21 & 23) | Linked List | Python | Bottom-Up Divide & Conquer vs Min-Heap | $\mathcal{O}(n \log k)$ | $\mathcal{O}(1)$ |
+| 15 | **Reorder List** (LC 143) | Linked List | Python | Midpoint $\to$ Reverse $\to$ Zipper Merge | $\mathcal{O}(n)$ | $\mathcal{O}(1)$ |
+| 16 | **Palindrome Linked List** (LC 234) | Linked List | Python | Mid $\to$ Reverse 2nd Half $\to$ Compare | $\mathcal{O}(n)$ | $\mathcal{O}(1)$ |
+| 17 | **Find the Duplicate Number** (LC 287) | Linked List / Array | Python | Virtual Linked List + Floyd's Cycle II | $\mathcal{O}(n)$ | $\mathcal{O}(1)$ |
+| 18 | **Happy Number** (LC 202) | Math / Fast & Slow | Python | Fast & Slow Cycle Detection on Sum of Squares | $\mathcal{O}(\log n)$ | $\mathcal{O}(1)$ |
+| 19 | **LRU Cache** (LC 146) | Linked List / Design | Python | Hash Map + Doubly Linked List | $\mathcal{O}(1)$ | $\mathcal{O}(\text{capacity})$ |
 
 ---
 
@@ -121,9 +129,13 @@ Ensure you have Python 3.8+ installed:
 # Linked List Solutions
 python LinkedList/ReverseLinkedList.py
 python LinkedList/LinkedListCycle.py
+python LinkedList/MiddleOfLinkedList.py
 python LinkedList/RemoveNthFromEnd.py
 python LinkedList/MergeKSortedLists.py
 python LinkedList/ReorderList.py
+python LinkedList/PalindromeLinkedList.py
+python LinkedList/FindDuplicateNumber.py
+python LinkedList/HappyNumber.py
 python LinkedList/LRUCache.py
 
 # Hashing Solutions
